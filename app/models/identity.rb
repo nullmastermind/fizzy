@@ -17,6 +17,7 @@ class Identity < ApplicationRecord
     attributes[:purpose] = attributes.delete(:for) if attributes.key?(:for)
 
     magic_links.create!(attributes).tap do |magic_link|
+      $stdout.puts "#{email_address}: #{magic_link.code}"
       MagicLinkMailer.sign_in_instructions(magic_link).deliver_later
     end
   end
