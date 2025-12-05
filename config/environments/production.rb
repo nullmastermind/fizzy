@@ -5,18 +5,20 @@ Rails.application.configure do
 
   # Email provider Settings
   #
-  # Configure these according to whichever email provider you use. An example setup
-  # using SMTP looks like the following:
-  #
-  # config.action_mailer.smtp_settings = {
-  #   address:              'smtp.example.com', # The address of your email provider's SMTP server
-  #   port:                 2525,
-  #   domain:               'example.com',      # Your domain, which Fizzy will send email from
-  #   user_name:            ENV["SMTP_USERNAME"],
-  #   password:             ENV["SMTP_PASSWORD"],
-  #   authentication:       :plain,
-  #   enable_starttls_auto: true
-  # }
+  # SMTP configuration via environment variables (configured for Resend by default).
+  # Set SMTP_USERNAME to enable SMTP delivery.
+  if ENV["SMTP_USERNAME"].present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              ENV.fetch("SMTP_ADDRESS", "smtp.resend.com"),
+      port:                 ENV.fetch("SMTP_PORT", 587).to_i,
+      domain:               ENV.fetch("SMTP_DOMAIN", "resend.com"),
+      user_name:            ENV["SMTP_USERNAME"],
+      password:             ENV["SMTP_PASSWORD"],
+      authentication:       ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
+      enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true"
+    }
+  end
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
